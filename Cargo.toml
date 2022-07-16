@@ -1,0 +1,13 @@
+[package]
+name = "terminal_visualizations"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+image = "0.24.2"
+thiserror = "1.0.31"
+clap = { version = "3.2.12", features = ["derive"] }
+num-traits = "0.2.15"
+terminal_size = "0.2.1"
