@@ -1,25 +1,24 @@
-use std::cmp::Ordering;
-
 use crate::{error::Error, image::Image};
+use std::cmp::Ordering;
 use terminal_size::{terminal_size, Height, Width};
 
-const TERMINAL_BELOW_CONTENT_SIZE: u32 = 1;
+const TERMINAL_BOTTOM_CONTENT_SIZE: u32 = 1;
 const TERMINAL_CELL_WIDTH_HEIGHT_RATIO: f32 = 2.5;
 
 struct TerminalImageProperties {
     width: u32,
     height: u32,
-    border_size_width: u32,
-    border_size_height: u32,
+    border_width: u32,
+    border_height: u32,
 }
 
 impl TerminalImageProperties {
-    fn new(width: u32, height: u32, border_size_width: u32, border_size_height: u32) -> Self {
+    fn new(width: u32, height: u32, border_width: u32, border_height: u32) -> Self {
         Self {
             width,
             height,
-            border_size_width,
-            border_size_height,
+            border_width,
+            border_height,
         }
     }
 }
@@ -35,11 +34,6 @@ impl Terminal {
     fn ratio() -> Result<f32, Error> {
         Self::size().and_then(|(width, height)| Ok(width as f32 / height as f32))
     }
-    fn ratio_relative() -> Result<f32, Error> {
-        Self::size().and_then(|(width, height)| {
-            Ok(width as f32 / (height as f32 * TERMINAL_CELL_WIDTH_HEIGHT_RATIO))
-        })
-    }
     fn convert_dimensions_to_terminal_dimensions(
         terminal_image_properties: TerminalImageProperties,
         below_content_size: u32,
@@ -47,24 +41,42 @@ impl Terminal {
         let TerminalImageProperties {
             width,
             height,
-            border_size_width,
-            border_size_height,
+            border_width,
+            border_height,
         } = terminal_image_properties;
+        let height_without_bottom = height - below_content_size;
 
-        let border_width_total = 2 * border_size_width;
-        let border_height_total = below_content_size + 2 * border_size_height;
+        let (terminal_width, terminal_height) = Self::size()?;
+        let terminal_width = terminal_width as u32;
+        let terminal_height = terminal_height as u32;
+        let terminal_height_without_bottom = terminal_height - below_content_size;
 
-        if border_width_total >= width || border_height_total >= height {
+        let width_diff_total = terminal_width - width;
+        let height_diff_total = terminal_height_without_bottom - height_without_bottom;
+
+        let width_diff_side = width_diff_total / 2;
+        let height_diff_side = height_diff_total / 2;
+
+        let border_width_centered = border_width.max(width_diff_side);
+        let border_height_centered = border_height.max(height_diff_side);
+
+        let border_width_total = 2 * border_width_centered;
+        let border_height_total = 2 * border_height_centered;
+
+        if border_width_total >= terminal_width
+            || border_height_total >= terminal_height_without_bottom
+        {
             return Err(Error::InvalidDimensions);
         }
 
-        let width_corrected = width - border_width_total;
-        let height_corrected = height - border_height_total;
+        let width_corrected = terminal_width - border_width_total;
+        let height_corrected = terminal_height_without_bottom - border_height_total;
+
         Ok(TerminalImageProperties::new(
             width_corrected,
             height_corrected,
-            border_size_width,
-            border_size_height,
+            border_width_centered,
+            border_height_centered,
         ))
     }
     fn resize_dimensions_to_terminal_ratio(dimensions_ratio: f32) -> Result<(u32, u32), Error> {
@@ -106,7 +118,7 @@ impl Terminal {
 
         match Terminal::convert_dimensions_to_terminal_dimensions(
             terminal_image_properties,
-            TERMINAL_BELOW_CONTENT_SIZE,
+            TERMINAL_BOTTOM_CONTENT_SIZE,
         ) {
             Ok(terminal_image_properties) => Ok(terminal_image_properties),
             Err(error @ Error::InvalidDimensions) => {
@@ -123,12 +135,13 @@ impl Terminal {
         let TerminalImageProperties {
             width,
             height,
-            border_size_width,
-            border_size_height,
+            border_width: border_size_width,
+            border_height: border_size_height,
         } = Self::get_terminal_image_properties(image.ratio(), border_size)?;
 
-        let ascii_image = image.to_ascii_image_with_size(width, height)?;
-        ascii_image.print((border_size_width, border_size_height));
+        let ascii_image =
+            image.to_ascii_image_with_size(width, height, border_size_width, border_size_height)?;
+        print!("{}", ascii_image.to_string());
         Ok(())
     }
 }

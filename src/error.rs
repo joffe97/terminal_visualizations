@@ -8,9 +8,6 @@ pub enum Error {
     #[error("error occurred due to invalid dimensions")]
     InvalidDimensions,
 
-    #[error("an unknown image error occurred")]
-    UnknownImageError,
-
     #[error("terminal was not found")]
     TerminalNotFound,
 
