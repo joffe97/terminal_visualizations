@@ -12,3 +12,4 @@ clap = { version = "3.2.12", features = ["derive"] }
 num-traits = "0.2.15"
 terminal_size = "0.2.1"
 num = "0.4.0"
+opencv = "0.66.0"

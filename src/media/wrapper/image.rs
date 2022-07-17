@@ -1,5 +1,7 @@
-use super::{ascii_transformer::AsciiTransformer, AsciiImage};
-use crate::error::Error;
+use crate::{
+    error::Error,
+    media::ascii::{AsciiImage, AsciiTransformer},
+};
 use image::{imageops::FilterType, io::Reader, DynamicImage};
 use std::path::Path;
 

@@ -10,7 +10,7 @@ pub struct AsciiImage {
 
 impl ToString for AsciiImage {
     fn to_string(&self) -> String {
-        let mut final_string = String::with_capacity(self.total_size_with_newlines());
+        let mut final_string = String::with_capacity(self.total_size());
 
         let content_iterator = &mut self
             .content
@@ -23,7 +23,6 @@ impl ToString for AsciiImage {
             .repeat(((self.content_width + 2 * self.border_width) * self.border_height) as usize);
 
         final_string.push_str(&border_string_verical);
-        final_string.push_str("\n");
         for _ in 0..self.content_height {
             let line_string = content_iterator
                 .take(self.content_width as usize)
@@ -31,10 +30,8 @@ impl ToString for AsciiImage {
             final_string.push_str(&border_string_horizontal);
             final_string.push_str(&line_string);
             final_string.push_str(&border_string_horizontal);
-            final_string.push_str("\n");
         }
         final_string.push_str(&border_string_verical);
-        final_string.push_str("\n");
 
         final_string
     }
@@ -67,8 +64,5 @@ impl AsciiImage {
     }
     fn total_size(&self) -> usize {
         self.total_width() * self.total_height()
-    }
-    fn total_size_with_newlines(&self) -> usize {
-        self.total_size() + self.total_height()
     }
 }

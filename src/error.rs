@@ -14,9 +14,15 @@ pub enum Error {
     #[error("the given value cannot be NAN")]
     NANError,
 
+    #[error("string cannot be made out of given object")]
+    StringConversionError,
+
     #[error(transparent)]
     IOError(#[from] std::io::Error),
 
     #[error(transparent)]
     ImageError(#[from] image::ImageError),
+
+    #[error(transparent)]
+    OpenCVError(#[from] opencv::Error),
 }
