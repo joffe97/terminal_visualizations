@@ -2,6 +2,7 @@ mod error;
 mod image;
 mod system;
 mod terminal;
+mod video;
 
 use error::Error;
 
