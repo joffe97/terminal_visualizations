@@ -2,4 +2,4 @@ mod image;
 mod video;
 
 pub use self::image::Image;
-pub use video::Video;
+pub use video::Mp4Video;

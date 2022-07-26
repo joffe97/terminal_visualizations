@@ -1,5 +1,5 @@
 use super::args::Args;
-use crate::{error::Error, media::wrapper::Video, terminal::Terminal};
+use crate::{error::Error, media::wrapper::Mp4Video, terminal::Terminal};
 use clap::Parser;
 
 pub struct System {
@@ -13,12 +13,12 @@ impl System {
     }
     fn run_for_image(&self) -> Result<(), Error> {
         let image = crate::media::wrapper::Image::try_from(self.args.file_path.as_path())?;
-        Terminal::print_image(image, 1)
+        Terminal::print_image(image, self.args.border)
     }
     fn run_for_video(&self) -> Result<(), Error> {
-        let mut video = Video::try_from(self.args.file_path.as_path())?;
-        let frame = video.read_frame()?;
-        todo!()
+        let mut video = Mp4Video::try_from(self.args.file_path.as_path())?;
+        let frame = video.read_frame(10)?.ok_or(Error::DifferentDimensions)?;
+        Terminal::print_image(frame, self.args.border)
     }
     pub fn run(&self) -> Result<(), Error> {
         if true {

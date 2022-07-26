@@ -17,6 +17,9 @@ pub enum Error {
     #[error("string cannot be made out of given object")]
     StringConversionError,
 
+    #[error("index is out of range")]
+    IndexError,
+
     #[error(transparent)]
     IOError(#[from] std::io::Error),
 
@@ -24,5 +27,5 @@ pub enum Error {
     ImageError(#[from] image::ImageError),
 
     #[error(transparent)]
-    OpenCVError(#[from] opencv::Error),
+    Mp4Error(#[from] mp4::Error),
 }
